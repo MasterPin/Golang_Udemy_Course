@@ -5,19 +5,13 @@ import (
 	"os"
 )
 
-type Todo struct {
-	Name        string
-	Description string
-}
-
 func main() {
-	td := Todo{"Test templates", "Let's test a template to see the magic."}
 
-	t, err := template.New("todos").Parse("You have a task named \"{{ .Name}}\" with description: \"{{ .Description}}\"")
+	t, err := template.New("hello_world").Parse("tmpls/hello_world.tmpl")
 	if err != nil {
 		panic(err)
 	}
-	err = t.Execute(os.Stdout, td)
+	err = t.Execute(os.Stdout, t)
 	if err != nil {
 		panic(err)
 	}
