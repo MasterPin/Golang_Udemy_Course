@@ -3,14 +3,14 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"io"
 	"net"
-	"time"
 )
 
 //todo: in here you'll build a webserver that is called up on startup
 
 func main() {
-	listen, err := net.Listen("tcp", ":8080")
+	listen, err := net.Listen("tcp", "localhost:8080")
 	if err != nil {
 		panic(err)
 	}
@@ -24,14 +24,11 @@ func main() {
 		}
 
 		go handle(connection)
+		go client()
 	}
 }
 
 func handle(connection net.Conn) {
-	err := connection.SetReadDeadline(time.Now().Add(10 * time.Second))
-	if err != nil {
-		println("connection Timeout")
-	}
 	scanner := bufio.NewScanner(connection)
 	for scanner.Scan() {
 		ln := scanner.Text()
@@ -40,4 +37,19 @@ func handle(connection net.Conn) {
 	}
 	defer connection.Close()
 	fmt.Println("connection to tcp server closed")
+}
+
+// cookiejar.Jar{} is a thing....didnt know that and want to keep that knowledge for later :)
+func client() {
+	connection, err := net.Dial("tcp", "localhost:8080")
+	if err != nil {
+		panic(err)
+	}
+	defer connection.Close()
+	reader, err := io.ReadAll(connection)
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println(string(reader))
 }
