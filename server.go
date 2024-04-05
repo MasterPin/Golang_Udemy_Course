@@ -3,7 +3,6 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"io"
 	"net"
 )
 
@@ -22,11 +21,7 @@ func main() {
 			panic(err)
 		}
 
-		io.WriteString(connection, "\n Hello from TCP server\n")
-		fmt.Fprintln(connection, "How is your day?")
-		fmt.Fprintf(connection, "%v", "Well,I Hope!")
-
-		connection.Close()
+		go handle(connection)
 	}
 }
 
