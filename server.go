@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"net"
+	"time"
 )
 
 //todo: in here you'll build a webserver that is called up on startup
@@ -27,6 +28,10 @@ func main() {
 }
 
 func handle(connection net.Conn) {
+	err := connection.SetReadDeadline(time.Now().Add(10 * time.Second))
+	if err != nil {
+		println("connection Timeout")
+	}
 	scanner := bufio.NewScanner(connection)
 	for scanner.Scan() {
 		ln := scanner.Text()
