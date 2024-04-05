@@ -15,6 +15,7 @@ func main() {
 	}
 	fmt.Println("listening on tcp:8080")
 	defer listen.Close()
+
 	for {
 		connection, err := listen.Accept()
 		if err != nil {
@@ -30,6 +31,8 @@ func handle(connection net.Conn) {
 	for scanner.Scan() {
 		ln := scanner.Text()
 		fmt.Println(ln)
+		fmt.Fprintf(connection, "I heard you say: %s \n", ln)
 	}
 	defer connection.Close()
+	fmt.Println("connection to tcp server closed")
 }
