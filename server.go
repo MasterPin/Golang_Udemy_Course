@@ -5,11 +5,14 @@ import (
 	"fmt"
 	"io"
 	"net"
+	"net/http"
+	"strings"
 )
 
 //todo: in here you'll build a webserver that is called up on startup
 
 func main() {
+
 	listen, err := net.Listen("tcp", "localhost:8080")
 	if err != nil {
 		panic(err)
@@ -17,6 +20,9 @@ func main() {
 	fmt.Println("listening on tcp:8080")
 	defer listen.Close()
 
+	mux := http.NewServeMux()
+	mux.HandleFunc("/query", query)
+	http.ListenAndServe("localhost:8080", mux)
 	for {
 		connection, err := listen.Accept()
 		if err != nil {
@@ -25,18 +31,50 @@ func main() {
 
 		go handle(connection)
 	}
+
+}
+
+func query(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "you reached the query!")
+	r.Body.Read([]byte("you reached the query!"))
 }
 
 func handle(connection net.Conn) {
-	scanner := bufio.NewScanner(connection)
+	defer connection.Close()
+
+	request(connection)
+
+	respond(connection)
+
+}
+
+func request(conn net.Conn) {
+	i := 0
+	scanner := bufio.NewScanner(conn)
 	for scanner.Scan() {
 		ln := scanner.Text()
-		bs := []byte(ln)
-		r13 := rot13(bs)
-		fmt.Fprintf(connection, "here is your encrypted msg: %s\n ", r13)
+		fmt.Println(ln)
+		if i == 0 {
+			//	request line
+			httpMethod := strings.Fields(ln)[0]
+			uri := strings.Fields(ln)[1]
+			fmt.Println("***METHOD", httpMethod)
+			fmt.Println("***URI", uri)
+		}
+		if ln == "" {
+			//	header are done
+			break
+		}
+		i++
 	}
-	defer connection.Close()
-	fmt.Println("connection to tcp server closed")
+}
+
+func respond(conn net.Conn) {
+	body := "this is a text"
+	fmt.Fprintf(conn, body)
+	fmt.Fprint(conn, "HTTP/1.1 200 OK\r\n")
+	fmt.Fprint(conn, "Content-Type: test/html\r\n")
+	fmt.Fprint(conn, "\r\n")
 }
 
 func rot13(bs []byte) string {
