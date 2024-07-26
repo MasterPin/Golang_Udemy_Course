@@ -14,6 +14,7 @@ func (s Strawberry) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
 	if err != nil {
 		log.Fatal(err)
+
 	}
 
 	tpl.ExecuteTemplate(w, "index.gohtml", r.Form)
