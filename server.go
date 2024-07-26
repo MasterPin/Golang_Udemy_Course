@@ -44,8 +44,6 @@ func handle(connection net.Conn) {
 
 	request(connection)
 
-	respond(connection)
-
 }
 
 func request(conn net.Conn) {
@@ -70,26 +68,13 @@ func request(conn net.Conn) {
 }
 
 func respond(conn net.Conn) {
-	body := "this is a text"
+	body := "you have reached the main port\n"
 	fmt.Fprintf(conn, body)
 	fmt.Fprint(conn, "HTTP/1.1 200 OK\r\n")
 	fmt.Fprint(conn, "Content-Type: test/html\r\n")
 	fmt.Fprint(conn, "\r\n")
 }
 
-func rot13(bs []byte) string {
-	var r13 = make([]byte, len(bs))
-	for i, b := range bs {
-		if b <= 109 {
-			r13[i] = b + 13
-		} else {
-			r13[i] = b - 13
-		}
-	}
-	return string(r13)
-}
-
-// cookiejar.Jar{} is a thing....didnt know that and want to keep that knowledge for later :)
 func client() {
 	connection, err := net.Dial("tcp", "localhost:8080")
 	if err != nil {
