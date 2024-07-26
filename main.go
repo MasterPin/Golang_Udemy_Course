@@ -4,6 +4,7 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"net/url"
 )
 
 type Strawberry int
@@ -14,10 +15,25 @@ func (s Strawberry) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
 	if err != nil {
 		log.Fatal(err)
-
 	}
 
-	tpl.ExecuteTemplate(w, "index.gohtml", r.Form)
+	data := struct {
+		Method        string
+		Host          string
+		ContentLength int64
+		URL           *url.URL
+		Headers       http.Header
+		Submissions   url.Values
+	}{
+		r.Method,
+		r.Host,
+		r.ContentLength,
+		r.URL,
+		r.Header,
+		r.Form,
+	}
+
+	tpl.ExecuteTemplate(w, "index.gohtml", data)
 }
 
 func init() {
