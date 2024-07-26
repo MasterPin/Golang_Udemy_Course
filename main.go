@@ -10,13 +10,13 @@ type Strawberry int
 
 var tpl *template.Template
 
-func (s Strawberry) ServeHTTP(w http.ResponseWriter, request *http.Request) {
-	err := request.ParseForm()
+func (s Strawberry) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseForm()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	tpl.ExecuteTemplate(w, "index.gohtml", request.Form)
+	tpl.ExecuteTemplate(w, "index.gohtml", r.Form)
 }
 
 func init() {
